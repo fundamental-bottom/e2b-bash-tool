@@ -1,5 +1,5 @@
-// Excluded from pnpm test. Use pnpm test:vercel to run these tests.
-import { Sandbox } from "@vercel/sandbox";
+// Excluded from pnpm test. Use pnpm test:e2b to run these tests.
+import { Sandbox } from "@e2b/code-interpreter";
 import type { ToolExecutionOptions } from "ai";
 import { afterAll, assert, beforeAll, describe, expect, it } from "vitest";
 import { createBashTool } from "./tool.js";
@@ -10,23 +10,23 @@ const opts: ToolExecutionOptions = { toolCallId: "test", messages: [] };
 
 /** Generate a unique test directory to avoid race conditions between tests */
 function uniqueDir(): string {
-  return `/vercel/sandbox/test-${Date.now()}-${Math.random()
+  return `/home/user/test-${Date.now()}-${Math.random()
     .toString(36)
     .slice(2, 8)}`;
 }
 
 /**
  * Integration tests that verify createBashTool works correctly
- * with the real @vercel/sandbox environment.
+ * with the real @e2b/code-interpreter environment.
  *
- * These tests require Vercel OIDC authentication.
- * Run with: pnpm test:vercel
+ * These tests require E2B_API_KEY environment variable.
+ * Run with: pnpm test:e2b
  *
- * Note: createBashTool automatically uses /vercel/sandbox/workspace as the default
- * destination when a @vercel/sandbox instance is provided.
+ * Note: createBashTool automatically uses /home/user/workspace as the default
+ * destination when an @e2b/code-interpreter instance is provided.
  */
-describe("createBashTool @vercel/sandbox integration", () => {
-  let vercelSandbox: Sandbox;
+describe("createBashTool @e2b/code-interpreter integration", () => {
+  let e2bSandbox: Sandbox;
 
   const testFiles = {
     "src/index.ts": 'export const hello = "world";',
@@ -40,13 +40,13 @@ describe("createBashTool @vercel/sandbox integration", () => {
 
   beforeAll(async () => {
     console.log("Creating sandbox");
-    vercelSandbox = await Sandbox.create();
+    e2bSandbox = await Sandbox.create();
     console.log("Sandbox created");
   }, 10000);
 
   afterAll(async () => {
-    if (vercelSandbox) {
-      await vercelSandbox.stop();
+    if (e2bSandbox) {
+      await e2bSandbox.kill();
     }
   });
 
@@ -54,7 +54,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it("ls -la lists files with details", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -74,7 +74,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it("ls lists directory contents", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -95,7 +95,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it(`find . -name '*.ts' finds TypeScript files`, async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -117,7 +117,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it(`find . -name '*.json' finds JSON files`, async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -137,7 +137,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it("grep -r 'pattern' . searches file contents", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -158,7 +158,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it("grep finds specific patterns", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -180,7 +180,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it("cat <file> views file contents", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -198,7 +198,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it("cat package.json shows JSON content", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -217,10 +217,10 @@ describe("createBashTool @vercel/sandbox integration", () => {
   });
 
   describe("working directory", () => {
-    it("uses /vercel/sandbox/workspace as default destination", async () => {
+    it("uses /home/user/workspace as default destination", async () => {
       // This test verifies the default destination behavior - no custom destination
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         files: testFiles,
       });
 
@@ -231,13 +231,13 @@ describe("createBashTool @vercel/sandbox integration", () => {
       )) as CommandResult;
 
       expect(result.exitCode).toBe(0);
-      expect(result.stdout.trim()).toBe("/vercel/sandbox/workspace");
+      expect(result.stdout.trim()).toBe("/home/user/workspace");
     }, 10000);
 
     it("pwd shows custom destination within sandbox", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -257,7 +257,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it("reads file content correctly", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -276,7 +276,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it("writes file and can be read back", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: testFiles,
       });
@@ -307,7 +307,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it("uses custom toolPrompt when provided", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: { "data.json": "{}" },
         promptOptions: {
@@ -322,7 +322,7 @@ describe("createBashTool @vercel/sandbox integration", () => {
     it("disables tool hints with empty string toolPrompt", async () => {
       const dest = uniqueDir();
       const { tools } = await createBashTool({
-        sandbox: vercelSandbox,
+        sandbox: e2bSandbox,
         destination: dest,
         files: { "data.json": "{}" },
         promptOptions: {

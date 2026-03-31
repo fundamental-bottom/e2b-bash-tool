@@ -1,11 +1,11 @@
 import path from "node:path";
 import { getFilePaths, streamFiles } from "./files/loader.js";
+import { isE2BSandbox, wrapE2BSandbox } from "./sandbox/e2b.js";
 import {
   createJustBashSandbox,
   isJustBash,
   wrapJustBash,
 } from "./sandbox/just-bash.js";
-import { isVercelSandbox, wrapVercelSandbox } from "./sandbox/vercel.js";
 import { createBashExecuteTool } from "./tools/bash.js";
 import { createReadFileTool } from "./tools/read-file.js";
 import { createWriteFileTool } from "./tools/write-file.js";
@@ -13,7 +13,7 @@ import { createToolPrompt } from "./tools-prompt.js";
 import type { BashToolkit, CreateBashToolOptions, Sandbox } from "./types.js";
 
 const DEFAULT_DESTINATION = "/workspace";
-const VERCEL_SANDBOX_DESTINATION = "/vercel/sandbox/workspace";
+const E2B_SANDBOX_DESTINATION = "/home/user/workspace";
 const WRITE_BATCH_SIZE = 20;
 const DEFAULT_MAX_FILES = 1000;
 
@@ -48,8 +48,8 @@ export async function createBashTool(
 ): Promise<BashToolkit> {
   // Determine default destination based on sandbox type
   const defaultDestination =
-    options.sandbox && isVercelSandbox(options.sandbox)
-      ? VERCEL_SANDBOX_DESTINATION
+    options.sandbox && isE2BSandbox(options.sandbox)
+      ? E2B_SANDBOX_DESTINATION
       : DEFAULT_DESTINATION;
   const destination = options.destination ?? defaultDestination;
 
@@ -65,9 +65,9 @@ export async function createBashTool(
 
   if (options.sandbox) {
     // External sandbox provided - stream files and write in batches
-    // Check @vercel/sandbox first (more specific check)
-    if (isVercelSandbox(options.sandbox)) {
-      sandbox = wrapVercelSandbox(options.sandbox);
+    // Check @e2b/code-interpreter first (more specific check)
+    if (isE2BSandbox(options.sandbox)) {
+      sandbox = wrapE2BSandbox(options.sandbox);
     } else if (isJustBash(options.sandbox)) {
       sandbox = wrapJustBash(options.sandbox);
       usingJustBash = true;

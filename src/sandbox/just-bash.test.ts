@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
+import { isE2BSandbox } from "./e2b.js";
 import { isJustBash, wrapJustBash } from "./just-bash.js";
-import { isVercelSandbox } from "./vercel.js";
 
 describe("isJustBash", () => {
   it("returns false for null/undefined", () => {
@@ -121,31 +121,35 @@ describe("wrapJustBash", () => {
 });
 
 describe("duck-typing disambiguation", () => {
-  it("just-bash instance is not detected as vercel sandbox", () => {
+  it("just-bash instance is not detected as e2b sandbox", () => {
     const mockBash = {
       exec: async () => ({ stdout: "", stderr: "", exitCode: 0 }),
       cwd: "/workspace",
     };
 
     expect(isJustBash(mockBash)).toBe(true);
-    expect(isVercelSandbox(mockBash)).toBe(false);
+    expect(isE2BSandbox(mockBash)).toBe(false);
   });
 
-  it("vercel sandbox is not detected as just-bash", () => {
-    const mockVercel = {
+  it("e2b sandbox is not detected as just-bash", () => {
+    const mockE2B = {
       sandboxId: "sbx-123",
-      runCommand: async () => ({ stdout: "", stderr: "", exitCode: 0 }),
-      readFile: async () => null,
-      writeFiles: async () => {},
-      stop: async () => {},
+      commands: {
+        run: async () => ({ stdout: "", stderr: "", exitCode: 0 }),
+      },
+      files: {
+        read: async () => "",
+        write: async () => {},
+      },
+      kill: async () => {},
     };
 
-    expect(isVercelSandbox(mockVercel)).toBe(true);
-    // Vercel sandbox doesn't have exec method at top level
-    expect(isJustBash(mockVercel)).toBe(false);
+    expect(isE2BSandbox(mockE2B)).toBe(true);
+    // E2B sandbox doesn't have exec method at top level
+    expect(isJustBash(mockE2B)).toBe(false);
   });
 
-  it("custom Sandbox implementation is neither just-bash nor vercel", () => {
+  it("custom Sandbox implementation is neither just-bash nor e2b", () => {
     const customSandbox = {
       executeCommand: async () => ({ stdout: "", stderr: "", exitCode: 0 }),
       readFile: async () => "",
@@ -153,24 +157,28 @@ describe("duck-typing disambiguation", () => {
     };
 
     expect(isJustBash(customSandbox)).toBe(false);
-    expect(isVercelSandbox(customSandbox)).toBe(false);
+    expect(isE2BSandbox(customSandbox)).toBe(false);
   });
 
-  it("object with both exec and vercel properties is detected as vercel first", () => {
+  it("object with both exec and e2b properties is detected as e2b first", () => {
     // Edge case: object has both signatures
-    // In tool.ts, we check vercel first, so this should be vercel
+    // In tool.ts, we check e2b first, so this should be e2b
     const ambiguous = {
       exec: async () => ({ stdout: "", stderr: "", exitCode: 0 }),
       sandboxId: "sbx-123",
-      runCommand: async () => ({ stdout: "", stderr: "", exitCode: 0 }),
-      readFile: async () => null,
-      writeFiles: async () => {},
-      stop: async () => {},
+      commands: {
+        run: async () => ({ stdout: "", stderr: "", exitCode: 0 }),
+      },
+      files: {
+        read: async () => "",
+        write: async () => {},
+      },
+      kill: async () => {},
     };
 
     // Both would match
     expect(isJustBash(ambiguous)).toBe(true);
-    expect(isVercelSandbox(ambiguous)).toBe(true);
-    // But in tool.ts, vercel is checked first - this test documents the behavior
+    expect(isE2BSandbox(ambiguous)).toBe(true);
+    // But in tool.ts, e2b is checked first - this test documents the behavior
   });
 });

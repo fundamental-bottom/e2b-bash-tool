@@ -51,7 +51,7 @@ function createTempProject(codeBlocks: string[]): string {
         // Use actual built types for bash-tool, stubs for external packages
         "bash-tool": [join(REPO_ROOT, "dist/index.d.ts")],
         ai: [join(tempDir, "ai.d.ts")],
-        "@vercel/sandbox": [join(tempDir, "vercel-sandbox.d.ts")],
+        "@e2b/code-interpreter": [join(tempDir, "e2b-sandbox.d.ts")],
         "just-bash": [join(tempDir, "just-bash.d.ts")],
       },
     },
@@ -84,15 +84,22 @@ export class ToolLoopAgent<T = any> {
 `,
   );
 
-  // Create stub for @vercel/sandbox
+  // Create stub for @e2b/code-interpreter
   writeFileSync(
-    join(tempDir, "vercel-sandbox.d.ts"),
+    join(tempDir, "e2b-sandbox.d.ts"),
     `
 export class Sandbox {
   sandboxId: string;
   static create(): Promise<Sandbox>;
-  static get(opts: { sandboxId: string }): Promise<Sandbox>;
-  stop(): Promise<void>;
+  static connect(sandboxId: string): Promise<Sandbox>;
+  commands: {
+    run(cmd: string, opts?: { cwd?: string; envs?: Record<string, string>; timeout?: number }): Promise<{ exitCode: number; stdout: string; stderr: string }>;
+  };
+  files: {
+    read(path: string, opts?: { format?: "text" | "bytes" }): Promise<string>;
+    write(pathOrFiles: string | Array<{ path: string; data: string }>, data?: string): Promise<void>;
+  };
+  kill(): Promise<void>;
 }
 `,
   );
@@ -148,10 +155,10 @@ export class Bash {
       assumedImports.push('import type { LanguageModel } from "ai";');
     }
     if (
-      code.includes("@vercel/sandbox") ||
+      code.includes("@e2b/code-interpreter") ||
       (code.includes("Sandbox.") && !code.includes("BashToolSandbox"))
     ) {
-      assumedImports.push('import { Sandbox } from "@vercel/sandbox";');
+      assumedImports.push('import { Sandbox } from "@e2b/code-interpreter";');
     }
     if (code.includes("just-bash") || code.includes("new Bash")) {
       assumedImports.push('import { Bash } from "just-bash";');

@@ -28,7 +28,7 @@ export type {
   BashToolkit,
   CommandResult,
   CreateBashToolOptions,
+  E2BSandboxInstance,
   PromptOptions,
   Sandbox,
-  VercelSandboxInstance,
 } from "./types.js";

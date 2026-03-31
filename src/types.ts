@@ -1,4 +1,4 @@
-import type { Sandbox as VercelSandbox } from "@vercel/sandbox";
+import type { Sandbox as E2BSandbox } from "@e2b/code-interpreter";
 import type { JustBashLike } from "./sandbox/just-bash.js";
 
 export interface CommandResult {
@@ -94,10 +94,10 @@ export interface CreateBashToolOptions {
 
   /**
    * Override the default just-bash sandbox.
-   * Accepts a @vercel/sandbox instance, just-bash Bash instance,
+   * Accepts an @e2b/code-interpreter Sandbox instance, just-bash Bash instance,
    * or any object implementing Sandbox.
    */
-  sandbox?: Sandbox | VercelSandbox | JustBashLike;
+  sandbox?: Sandbox | E2BSandbox | JustBashLike;
 
   /**
    * Additional instructions to append to tool descriptions.
@@ -185,6 +185,6 @@ export interface BashToolkit {
 }
 
 /**
- * Re-export @vercel/sandbox Sandbox type for convenience.
+ * Re-export @e2b/code-interpreter Sandbox type for convenience.
  */
-export type { Sandbox as VercelSandboxInstance } from "@vercel/sandbox";
+export type { Sandbox as E2BSandboxInstance } from "@e2b/code-interpreter";

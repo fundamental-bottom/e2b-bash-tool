@@ -11,7 +11,7 @@ Instructions for AI agents using bash-tool in projects.
 ## What is bash-tool?
 
 - Provides `bash`, `readFile`, `writeFile` tools for AI SDK agents
-- Runs commands in sandboxed environments (just-bash or @vercel/sandbox)
+- Runs commands in sandboxed environments (just-bash or @e2b/code-interpreter)
 - Pre-populates sandbox with files from inline content or disk
 - Generates contextual LLM instructions with working directory and file list
 
@@ -58,26 +58,26 @@ const { bash } = await createBashTool({
 });
 ```
 
-### Use [@vercel/sandbox](https://vercel.com/docs/vercel-sandbox) for full VM
+### Use [@e2b/code-interpreter](https://e2b.dev/) for full VM
 
 ```typescript
-import { Sandbox } from "@vercel/sandbox";
+import { Sandbox } from "@e2b/code-interpreter";
 const vm = await Sandbox.create();
 const { tools } = await createBashTool({ sandbox: vm });
-// Call vm.stop() when done
+// Call vm.kill() when done
 ```
 
 ### Persistent sandbox across serverless invocations
 
 ```typescript
-import { Sandbox } from "@vercel/sandbox";
+import { Sandbox } from "@e2b/code-interpreter";
 
 // First invocation: create and store sandboxId
 const newSandbox = await Sandbox.create();
 const sandboxId = newSandbox.sandboxId; // store this
 
 // Later invocations: reconnect by ID
-const existingSandbox = await Sandbox.get({ sandboxId });
+const existingSandbox = await Sandbox.connect(sandboxId);
 const { tools } = await createBashTool({ sandbox: existingSandbox });
 // Previous files and state preserved
 ```
@@ -109,7 +109,7 @@ const { bash } = await createBashTool({
 
 ## Limitations
 
-- **just-bash is simulated** - Cannot support python, node.js or binaries; use @vercel/sandbox for a full VM. So, createBashTool supports full VMs, it is just the default that does not
+- **just-bash is simulated** - Cannot support python, node.js or binaries; use @e2b/code-interpreter for a full VM. So, createBashTool supports full VMs, it is just the default that does not
 - **No persistent state between calls** - Each `createBashTool` starts fresh, but the tool itself has persistence and it can be achieved across serverless function invocations by passing in the same sandbox across `createBashTool` invocations
 - **Text files only** - `files` option accepts strings, not buffers
 - **No streaming** - Command output returned after completion
@@ -134,7 +134,7 @@ try {
 
 ## Debugging Tips
 
-1. **Check sandbox type** - `isVercelSandbox()` and `isJustBash()` exported for detection
+1. **Check sandbox type** - `isE2BSandbox()` and `isJustBash()` exported for detection
 2. **Inspect tool description** - `bash.description` shows working dir and file list
 3. **Use `pwd` first** - Verify working directory matches expectations
 4. **Check `exitCode`** - Non-zero means command failed, check `stderr`

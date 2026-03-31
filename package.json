@@ -23,9 +23,9 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && sed '1,/^-->/d' AGENTS.npm.md > dist/AGENTS.md",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.examples.json",
-    "test": "vitest --exclude 'src/tool.vercel.integration.test.ts'",
-    "test:run": "vitest run --exclude 'src/tool.vercel.integration.test.ts'",
-    "test:vercel": "vitest run src/tool.vercel.integration.test.ts --sequence.concurrent",
+    "test": "vitest --exclude 'src/tool.e2b.integration.test.ts'",
+    "test:run": "vitest run --exclude 'src/tool.e2b.integration.test.ts'",
+    "test:e2b": "vitest run src/tool.e2b.integration.test.ts --sequence.concurrent",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
@@ -40,7 +40,7 @@
     "agent",
     "ai-sdk",
     "sandbox",
-    "vercel"
+    "e2b"
   ],
   "author": "Vercel, Inc.",
   "license": "MIT",
@@ -62,16 +62,17 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@ai-sdk/amazon-bedrock": "^4.0.85",
     "@biomejs/biome": "^2.3.11",
+    "@e2b/code-interpreter": "^1.0.0",
     "@types/node": "^22.10.0",
-    "@vercel/sandbox": "^1.2.0",
     "ai": "^6.0.13",
     "knip": "^5.80.0",
     "typescript": "^5.7.0",
     "vitest": "^2.1.0"
   },
   "peerDependencies": {
-    "@vercel/sandbox": "*",
+    "@e2b/code-interpreter": "*",
     "ai": "^6.0.0",
     "just-bash": "^2.9.3"
   },
@@ -79,7 +80,7 @@
     "just-bash": {
       "optional": true
     },
-    "@vercel/sandbox": {
+    "@e2b/code-interpreter": {
       "optional": true
     }
   }

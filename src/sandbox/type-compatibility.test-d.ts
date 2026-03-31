@@ -2,18 +2,18 @@
  * Type compatibility tests to ensure types work correctly.
  * These tests only check types at compile time - they don't run.
  */
-import type { Sandbox as VercelSandbox } from "@vercel/sandbox";
+import type { Sandbox as E2BSandbox } from "@e2b/code-interpreter";
 import type { CreateBashToolOptions, Sandbox } from "../types.js";
-import type { VercelSandboxLike } from "./vercel.js";
+import type { E2BSandboxLike } from "./e2b.js";
 
-// Test: @vercel/sandbox Sandbox class is assignable to our VercelSandboxLike interface
-function vercelSandboxMatchesOurInterface(sandbox: VercelSandbox) {
-  const compatible: VercelSandboxLike = sandbox;
+// Test: @e2b/code-interpreter Sandbox class is assignable to our E2BSandboxLike interface
+function e2bSandboxMatchesOurInterface(sandbox: E2BSandbox) {
+  const compatible: E2BSandboxLike = sandbox;
   return compatible;
 }
 
-// Test: @vercel/sandbox instance can be passed to createBashTool
-function acceptsVercelSandbox(sandbox: VercelSandbox) {
+// Test: @e2b/code-interpreter instance can be passed to createBashTool
+function acceptsE2BSandbox(sandbox: E2BSandbox) {
   const options: CreateBashToolOptions = { sandbox };
   return options;
 }
@@ -26,6 +26,6 @@ function ourSandboxIsValid(sandbox: Sandbox) {
 }
 
 // Suppress unused variable warnings
-void vercelSandboxMatchesOurInterface;
-void acceptsVercelSandbox;
+void e2bSandboxMatchesOurInterface;
+void acceptsE2BSandbox;
 void ourSandboxIsValid;

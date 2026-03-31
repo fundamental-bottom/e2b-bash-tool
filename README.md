@@ -8,7 +8,7 @@ Generic bash tool for AI agents, compatible with [AI SDK](https://ai-sdk.dev/).
 npm install bash-tool just-bash
 ```
 
-For full VM support, install [`@vercel/sandbox`](https://vercel.com/docs/vercel-sandbox) or another sandbox product instead of `just-bash`.
+For full VM support, install [`@e2b/code-interpreter`](https://e2b.dev/) or another sandbox product instead of `just-bash`.
 
 ## Usage
 
@@ -91,25 +91,26 @@ const { bash } = await createBashTool({
 });
 ```
 
-### Use [@vercel/sandbox](https://vercel.com/docs/vercel-sandbox) for full VM
+### Use [@e2b/code-interpreter](https://e2b.dev/) for full VM
 
 ```typescript
-import { Sandbox } from "@vercel/sandbox";
+import { Sandbox } from "@e2b/code-interpreter";
 
 const sandbox = await Sandbox.create();
-// Files are written to ./workspace by default
+// Files are written to /home/user/workspace by default
 const { tools } = await createBashTool({
   sandbox,
   files: { "index.ts": "console.log('hello');" },
 });
+// Call sandbox.kill() when done
 ```
 
 ### Persistent sandbox across serverless invocations
 
-Use `Sandbox.get` to reconnect to an existing sandbox by ID:
+Use `Sandbox.connect` to reconnect to an existing sandbox by ID:
 
 ```typescript
-import { Sandbox } from "@vercel/sandbox";
+import { Sandbox } from "@e2b/code-interpreter";
 
 // First invocation: create sandbox and store the ID
 const newSandbox = await Sandbox.create();
@@ -117,7 +118,7 @@ const sandboxId = newSandbox.sandboxId;
 // Store sandboxId in database, session, or return to client
 
 // Subsequent invocations: reconnect to existing sandbox
-const existingSandbox = await Sandbox.get({ sandboxId });
+const existingSandbox = await Sandbox.connect(sandboxId);
 const { tools } = await createBashTool({ sandbox: existingSandbox });
 // All previous files and state are preserved
 ```

@@ -8,11 +8,17 @@
  */
 
 import path from "node:path";
+import { createAmazonBedrock } from "@ai-sdk/amazon-bedrock";
 import { ToolLoopAgent } from "ai";
 import {
   createBashTool,
   experimental_createSkillTool as createSkillTool,
 } from "../../src/index.js";
+
+const bedrock = createAmazonBedrock({
+  region: process.env.AWS_REGION ?? "us-east-1",
+  apiKey: process.env.AWS_BEARER_TOKEN_BEDROCK,
+});
 
 async function main() {
   // Discover skills and get files to upload
@@ -34,7 +40,7 @@ async function main() {
 
   // Create the agent with skills
   const agent = new ToolLoopAgent({
-    model: "anthropic/claude-haiku-4.5",
+    model: bedrock("us.anthropic.claude-3-5-haiku-20241022-v1:0"),
     tools: {
       skill,
       bash: tools.bash,

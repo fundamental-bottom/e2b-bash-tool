@@ -60,3 +60,7 @@ Tests are co-located with source files (`*.test.ts`). Tests are included in Type
 - Integration tests (`tool.integration.test.ts`) use real just-bash
 
 AI SDK tool execute calls require `ToolExecutionOptions` with `toolCallId` and `messages`.
+
+## Workflow
+
+- Run `pnpm validate` before marking work done — it runs lint, knip, typecheck, build, and tests in sequence.

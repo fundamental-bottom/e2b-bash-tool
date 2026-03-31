@@ -3,6 +3,7 @@ import path from "node:path";
 import type { ToolExecutionOptions } from "ai";
 import { afterEach, assert, beforeEach, describe, expect, it } from "vitest";
 import { experimental_createSkillTool as createSkillTool } from "./skill-tool.js";
+import type { SkillLoader } from "./skills/types.js";
 import { createBashTool } from "./tool.js";
 
 // AI SDK tool execute requires (args, options) - we provide test options
@@ -219,5 +220,109 @@ description: Echo utility
 
     expect(result.exitCode).toBe(0);
     expect(result.stdout).toContain("hello from skill");
+  });
+});
+
+describe("createSkillTool with custom loader", () => {
+  it("works with a custom SkillLoader", async () => {
+    const loader: SkillLoader = {
+      async loadSkills() {
+        return [
+          {
+            name: "custom",
+            description: "A custom skill",
+            slug: "custom-skill",
+            body: "# Custom Instructions\n\nDo custom things.",
+            files: ["SKILL.md", "run.sh"],
+            fileContents: {
+              "SKILL.md":
+                "---\nname: custom\ndescription: A custom skill\n---\n\n# Custom Instructions\n\nDo custom things.",
+              "run.sh": 'echo "custom"',
+            },
+          },
+        ];
+      },
+    };
+
+    const { skill, skills, files, instructions } = await createSkillTool({
+      loader,
+    });
+
+    expect(skills).toHaveLength(1);
+    expect(skills[0].name).toBe("custom");
+    expect(skills[0].sandboxPath).toBe("./skills/custom-skill");
+    expect(skills[0].body).toContain("Custom Instructions");
+    expect(files["./skills/custom-skill/SKILL.md"]).toContain("custom");
+    expect(files["./skills/custom-skill/run.sh"]).toBe('echo "custom"');
+    expect(instructions).toContain("custom-skill");
+
+    // Execute the skill tool
+    assert(skill.execute, "skill.execute should be defined");
+    const result = (await skill.execute(
+      { skillName: "custom" },
+      opts,
+    )) as SkillResult;
+
+    expect(result.success).toBe(true);
+    expect(result.instructions).toContain("Custom Instructions");
+    expect(result.files).toEqual(["run.sh"]);
+  });
+
+  it("works with an empty loader", async () => {
+    const loader: SkillLoader = {
+      async loadSkills() {
+        return [];
+      },
+    };
+
+    const { skills, files, instructions } = await createSkillTool({ loader });
+
+    expect(skills).toHaveLength(0);
+    expect(Object.keys(files)).toHaveLength(0);
+    expect(instructions).toBe("");
+  });
+
+  it("throws when both skillsDirectory and loader are provided", async () => {
+    const loader: SkillLoader = {
+      async loadSkills() {
+        return [];
+      },
+    };
+
+    await expect(
+      createSkillTool({
+        skillsDirectory: "/tmp",
+        loader,
+      }),
+    ).rejects.toThrow("Cannot specify both");
+  });
+
+  it("throws when neither skillsDirectory nor loader is provided", async () => {
+    await expect(createSkillTool({})).rejects.toThrow("Must specify either");
+  });
+
+  it("respects custom destination with loader", async () => {
+    const loader: SkillLoader = {
+      async loadSkills() {
+        return [
+          {
+            name: "test",
+            description: "Test",
+            slug: "test-slug",
+            body: "instructions",
+            files: ["SKILL.md"],
+            fileContents: { "SKILL.md": "content" },
+          },
+        ];
+      },
+    };
+
+    const { skills, files } = await createSkillTool({
+      loader,
+      destination: "my-skills",
+    });
+
+    expect(skills[0].sandboxPath).toBe("./my-skills/test-slug");
+    expect(files["./my-skills/test-slug/SKILL.md"]).toBe("content");
   });
 });

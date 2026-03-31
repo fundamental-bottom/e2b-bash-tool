@@ -1,9 +1,12 @@
 export type { JustBashLike } from "./sandbox/just-bash.js";
 export { experimental_createSkillTool } from "./skill-tool.js";
+export { createLocalSkillLoader } from "./skills/loader.js";
 export type {
   CreateSkillToolOptions,
   DiscoveredSkill,
+  LoadedSkill,
   Skill,
+  SkillLoader,
   SkillMetadata,
   SkillToolkit,
 } from "./skills/types.js";

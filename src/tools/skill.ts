@@ -1,8 +1,5 @@
-import fs from "node:fs/promises";
-import path from "node:path";
 import { tool } from "ai";
 import { z } from "zod";
-import { extractBody } from "../skills/parser.js";
 import type { Skill } from "../skills/types.js";
 
 const skillSchema = z.object({
@@ -63,32 +60,19 @@ export function createSkillTool(options: CreateSkillToolOptions) {
         };
       }
 
-      // Read the SKILL.md from local filesystem
-      const skillMdPath = path.join(skill.localPath, "SKILL.md");
+      // Get files list (excluding SKILL.md)
+      const files = skill.files.filter((f) => f !== "SKILL.md");
 
-      try {
-        const content = await fs.readFile(skillMdPath, "utf-8");
-        const body = extractBody(content);
-
-        // Get files list (excluding SKILL.md)
-        const files = skill.files.filter((f) => f !== "SKILL.md");
-
-        return {
-          success: true,
-          skill: {
-            name: skill.name,
-            description: skill.description,
-            path: skill.sandboxPath,
-          },
-          instructions: body,
-          files,
-        };
-      } catch (error) {
-        return {
-          success: false,
-          error: `Failed to read skill "${skillName}": ${error instanceof Error ? error.message : String(error)}`,
-        };
-      }
+      return {
+        success: true,
+        skill: {
+          name: skill.name,
+          description: skill.description,
+          path: skill.sandboxPath,
+        },
+        instructions: skill.body,
+        files,
+      };
     },
   });
 }

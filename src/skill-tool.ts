@@ -1,14 +1,34 @@
-import fs from "node:fs/promises";
 import path from "node:path";
-import { discoverSkills, listSkillFiles } from "./skills/parser.js";
+import { createLocalSkillLoader } from "./skills/loader.js";
 import type {
   CreateSkillToolOptions,
   Skill,
+  SkillLoader,
   SkillToolkit,
 } from "./skills/types.js";
 import { createSkillTool } from "./tools/skill.js";
 
 const DEFAULT_DESTINATION = "skills";
+
+function resolveLoader(options: CreateSkillToolOptions): SkillLoader {
+  const { skillsDirectory, loader } = options;
+
+  if (skillsDirectory && loader) {
+    throw new Error(
+      "Cannot specify both 'skillsDirectory' and 'loader'. Use one or the other.",
+    );
+  }
+
+  if (!skillsDirectory && !loader) {
+    throw new Error("Must specify either 'skillsDirectory' or 'loader'.");
+  }
+
+  if (loader) {
+    return loader;
+  }
+
+  return createLocalSkillLoader({ directory: skillsDirectory as string });
+}
 
 /**
  * Creates a skill toolkit for AI agents.
@@ -24,9 +44,14 @@ const DEFAULT_DESTINATION = "skills";
  *   createBashTool,
  * } from "@funda-ai/e2b-bash-tool";
  *
- * // Discover skills and get files
+ * // From a local directory
  * const { skill, skills, files, instructions } = await createSkillTool({
  *   skillsDirectory: "./skills",
+ * });
+ *
+ * // Or with a custom loader (S3, database, etc.)
+ * const { skill, skills, files, instructions } = await createSkillTool({
+ *   loader: myS3Loader,
  * });
  *
  * // Create bash tool with skill files
@@ -46,41 +71,30 @@ const DEFAULT_DESTINATION = "skills";
 export async function experimental_createSkillTool(
   options: CreateSkillToolOptions,
 ): Promise<SkillToolkit> {
-  const { skillsDirectory, destination = DEFAULT_DESTINATION } = options;
+  const { destination = DEFAULT_DESTINATION } = options;
+  const loader = resolveLoader(options);
 
-  // Discover all skills and collect their files
-  // sandboxDestination uses explicit relative path (e.g., "./skills") - works with any destination
-  const relativeDestination = `./${destination}`;
-  const discoveredSkills = await discoverSkills({
-    skillsDirectory,
-    sandboxDestination: relativeDestination,
-  });
+  // Load all skills via the loader
+  const loadedSkills = await loader.loadSkills();
 
-  // Enrich skills with file lists and collect all files
+  // Map LoadedSkill[] → Skill[] and collect files
   const skills: Skill[] = [];
   const allFiles: Record<string, string> = {};
 
-  for (const skill of discoveredSkills) {
-    const skillFiles = await listSkillFiles(skill.localPath);
+  for (const loaded of loadedSkills) {
+    const sandboxPath = `./${destination}/${loaded.slug}`;
 
-    // Add to skills with file list
     skills.push({
-      ...skill,
-      files: skillFiles,
+      name: loaded.name,
+      description: loaded.description,
+      sandboxPath,
+      body: loaded.body,
+      files: loaded.files,
     });
 
-    // Read and collect all files for this skill
-    const skillDirName = path.basename(skill.localPath);
-    for (const file of skillFiles) {
-      const localFilePath = path.join(skill.localPath, file);
-      const relativeFilePath = `./${path.posix.join(destination, skillDirName, file)}`;
-
-      try {
-        const content = await fs.readFile(localFilePath, "utf-8");
-        allFiles[relativeFilePath] = content;
-      } catch {
-        // Skip files that can't be read as text
-      }
+    for (const [file, content] of Object.entries(loaded.fileContents)) {
+      const key = `./${path.posix.join(destination, loaded.slug, file)}`;
+      allFiles[key] = content;
     }
   }
 

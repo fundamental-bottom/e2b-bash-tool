@@ -5,6 +5,7 @@
   "ignoreDependencies": [
     "just-bash",
     "@e2b/code-interpreter",
-    "@ai-sdk/amazon-bedrock"
+    "@ai-sdk/amazon-bedrock",
+    "@azure/storage-blob"
   ]
 }

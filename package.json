@@ -64,6 +64,7 @@
   },
   "devDependencies": {
     "@ai-sdk/amazon-bedrock": "^4.0.85",
+    "@azure/storage-blob": "^12.31.0",
     "@biomejs/biome": "^2.3.11",
     "@e2b/code-interpreter": "^1.0.0",
     "@types/node": "^22.10.0",

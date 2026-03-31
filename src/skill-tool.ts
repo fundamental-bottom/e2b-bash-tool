@@ -22,7 +22,7 @@ const DEFAULT_DESTINATION = "skills";
  * import {
  *   experimental_createSkillTool as createSkillTool,
  *   createBashTool,
- * } from "bash-tool";
+ * } from "@funda-ai/e2b-bash-tool";
  *
  * // Discover skills and get files
  * const { skill, skills, files, instructions } = await createSkillTool({

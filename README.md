@@ -1,11 +1,11 @@
-# bash-tool
+# @funda-ai/e2b-bash-tool
 
 Generic bash tool for AI agents, compatible with [AI SDK](https://ai-sdk.dev/).
 
 ## Installation
 
 ```bash
-npm install bash-tool just-bash
+npm install @funda-ai/e2b-bash-tool just-bash
 ```
 
 For full VM support, install [`@e2b/code-interpreter`](https://e2b.dev/) or another sandbox product instead of `just-bash`.
@@ -13,7 +13,7 @@ For full VM support, install [`@e2b/code-interpreter`](https://e2b.dev/) or anot
 ## Usage
 
 ```typescript
-import { createBashTool } from "bash-tool";
+import { createBashTool } from "@funda-ai/e2b-bash-tool";
 import { ToolLoopAgent, stepCountIs } from "ai";
 
 const { tools } = await createBashTool({
@@ -157,7 +157,7 @@ const { tools } = await createBashTool({
 ### Custom sandbox implementation
 
 ```typescript
-import { createBashTool, Sandbox } from "bash-tool";
+import { createBashTool, Sandbox } from "@funda-ai/e2b-bash-tool";
 
 const customSandbox: Sandbox = {
   async executeCommand(command) {
@@ -184,7 +184,7 @@ const { tools } = await createBashTool({ sandbox: customSandbox });
 import {
   experimental_createSkillTool as createSkillTool,
   createBashTool,
-} from "bash-tool";
+} from "@funda-ai/e2b-bash-tool";
 import { ToolLoopAgent } from "ai";
 
 // Discover skills and get files to upload
@@ -230,7 +230,7 @@ See the [example skills](./examples/skills-tool/skills/) for a complete referenc
 For AI agents working with bash-tool, additional guidance is available in `AGENTS.md`:
 
 ```bash
-cat node_modules/bash-tool/dist/AGENTS.md
+cat node_modules/@funda-ai/e2b-bash-tool/dist/AGENTS.md
 ```
 
 ## License

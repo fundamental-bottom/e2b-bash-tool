@@ -4,7 +4,7 @@ This file provides guidance for Claude Code when working on this project.
 
 ## Project Overview
 
-`bash-tool` is a generic bash tool for AI agents, compatible with AI SDK (https://ai-sdk.dev/). It provides bash, readFile, and writeFile tools that work with a sandboxed environment.
+`@funda-ai/e2b-bash-tool` is a generic bash tool for AI agents, compatible with AI SDK (https://ai-sdk.dev/). It provides bash, readFile, and writeFile tools that work with a sandboxed environment.
 
 ## Commands
 

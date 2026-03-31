@@ -49,7 +49,7 @@ function createTempProject(codeBlocks: string[]): string {
       typeRoots: [join(REPO_ROOT, "node_modules/@types")],
       paths: {
         // Use actual built types for bash-tool, stubs for external packages
-        "bash-tool": [join(REPO_ROOT, "dist/index.d.ts")],
+        "@funda-ai/e2b-bash-tool": [join(REPO_ROOT, "dist/index.d.ts")],
         ai: [join(tempDir, "ai.d.ts")],
         "@e2b/code-interpreter": [join(tempDir, "e2b-sandbox.d.ts")],
         "just-bash": [join(tempDir, "just-bash.d.ts")],
@@ -143,10 +143,15 @@ export class Bash {
       if (code.includes("createSkillTool")) {
         imports.push("experimental_createSkillTool as createSkillTool");
       }
-      if (code.includes('from "bash-tool"') && code.includes("Sandbox")) {
+      if (
+        code.includes('from "@funda-ai/e2b-bash-tool"') &&
+        code.includes("Sandbox")
+      ) {
         imports.push("Sandbox");
       }
-      assumedImports.push(`import { ${imports.join(", ")} } from "bash-tool";`);
+      assumedImports.push(
+        `import { ${imports.join(", ")} } from "@funda-ai/e2b-bash-tool";`,
+      );
     }
     if (code.includes("ToolLoopAgent") || code.includes("stepCountIs")) {
       assumedImports.push('import { ToolLoopAgent, stepCountIs } from "ai";');

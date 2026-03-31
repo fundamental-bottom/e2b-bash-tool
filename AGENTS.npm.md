@@ -1,12 +1,12 @@
 <!--
 This file is distributed as dist/AGENTS.md in the npm package.
-It provides instructions for AI agents using bash-tool in their projects.
+It provides instructions for AI agents using @funda-ai/e2b-bash-tool in their projects.
 The build process copies this file to dist/AGENTS.md (removing this comment).
 -->
 
-# AGENTS.md - bash-tool
+# AGENTS.md - @funda-ai/e2b-bash-tool
 
-Instructions for AI agents using bash-tool in projects.
+Instructions for AI agents using @funda-ai/e2b-bash-tool in projects.
 
 ## What is bash-tool?
 
@@ -18,7 +18,7 @@ Instructions for AI agents using bash-tool in projects.
 ## Quick Reference
 
 ```typescript
-import { createBashTool } from "bash-tool";
+import { createBashTool } from "@funda-ai/e2b-bash-tool";
 import { ToolLoopAgent, stepCountIs } from "ai";
 
 const { tools } = await createBashTool({
@@ -146,13 +146,13 @@ TypeScript types are available in the `.d.ts` files:
 
 ```bash
 # View main exports
-cat node_modules/bash-tool/dist/index.d.ts
+cat node_modules/@funda-ai/e2b-bash-tool/dist/index.d.ts
 
 # View all options and types
-cat node_modules/bash-tool/dist/types.d.ts
+cat node_modules/@funda-ai/e2b-bash-tool/dist/types.d.ts
 
 # Search for interfaces
-grep -r "^export interface" node_modules/bash-tool/dist/*.d.ts
+grep -r "^export interface" node_modules/@funda-ai/e2b-bash-tool/dist/*.d.ts
 ```
 
 Key types to explore:

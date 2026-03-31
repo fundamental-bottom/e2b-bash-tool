@@ -33,7 +33,7 @@ import { ToolLoopAgent } from "ai";
 import {
   experimental_createSkillTool as createSkillTool,
   createBashTool,
-} from "bash-tool";
+} from "@funda-ai/e2b-bash-tool";
 
 // Discover skills and get files
 const { loadSkill, skills, files, instructions } = await createSkillTool({
@@ -102,7 +102,7 @@ skills/
 Skills don't need scripts - they can be pure instructions. For skills that only contain a `SKILL.md` with no executable scripts, you can use `createSkillTool` standalone without `createBashTool`:
 
 ```typescript
-import { experimental_createSkillTool as createSkillTool } from "bash-tool";
+import { experimental_createSkillTool as createSkillTool } from "@funda-ai/e2b-bash-tool";
 
 // Discover instruction-only skills
 const { skill, skills } = await createSkillTool({

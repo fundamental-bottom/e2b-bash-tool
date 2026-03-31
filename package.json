@@ -1,5 +1,5 @@
 {
-  "name": "bash-tool",
+  "name": "@funda-ai/e2b-bash-tool",
   "publishConfig": {
     "access": "public"
   },
@@ -42,16 +42,16 @@
     "sandbox",
     "e2b"
   ],
-  "author": "Vercel, Inc.",
+  "author": "Funda AI",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vercel-labs/bash-tool.git"
+    "url": "git+https://github.com/fundamental-bottom/e2b-bash-tool.git"
   },
   "bugs": {
-    "url": "https://github.com/vercel-labs/bash-tool/issues"
+    "url": "https://github.com/fundamental-bottom/e2b-bash-tool/issues"
   },
-  "homepage": "https://github.com/vercel-labs/bash-tool#readme",
+  "homepage": "https://github.com/fundamental-bottom/e2b-bash-tool#readme",
   "engines": {
     "node": ">=18"
   },

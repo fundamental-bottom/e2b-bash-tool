@@ -31,7 +31,8 @@
     "format": "biome format --write .",
     "knip": "knip",
     "validate": "pnpm run lint && pnpm run knip && pnpm run typecheck && pnpm run build && pnpm run test:run",
-    "prepublishOnly": "pnpm run validate && pnpm run build"
+    "prepublishOnly": "pnpm run validate && pnpm run build",
+    "release": "bumpp"
   },
   "keywords": [
     "bash",
@@ -67,6 +68,7 @@
     "@e2b/code-interpreter": "^1.0.0",
     "@types/node": "^22.10.0",
     "ai": "^6.0.13",
+    "bumpp": "^11.0.1",
     "knip": "^5.80.0",
     "typescript": "^5.7.0",
     "vitest": "^2.1.0"

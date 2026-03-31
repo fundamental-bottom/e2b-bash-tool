@@ -28,9 +28,6 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Validate
-        run: pnpm run validate
-
       - name: Publish to npm
         run: pnpm publish --no-git-checks
         env:
